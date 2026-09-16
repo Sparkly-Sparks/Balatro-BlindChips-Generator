@@ -298,7 +298,7 @@ for cycle,i in enumerate(faces):
                     pixel=coords(num)
                     if k[3]>0:
                         shine=1
-                        if Image.open(f"Glyphs/{i}.png").get_flattened_data()[num][3]>0:
+                        if mode!="b" and Image.open(f"Glyphs/{i}.png").get_flattened_data()[num][3]>0:
                             shine=2
                         Output.alpha_composite(Image.open(f"Pallete/shine{shine}.png"),(pixel[0]+scale*j,pixel[1]+scale*cycle))
             if active_preview:
