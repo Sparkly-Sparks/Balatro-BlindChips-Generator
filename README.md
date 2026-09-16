@@ -7,3 +7,5 @@ This is a python script (and files) for creating textures for boss blinds for mo
 # How to use
 1. Put the symbols for your blinds in the "Glyphs" folder
 2. Run and use the python file
+# Feedback
+If you have anything to say about your experience, you may do so [here]().
