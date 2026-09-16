@@ -1,0 +1,33 @@
+Make a copy of default.json to create your own preset file.
+This is how a preset file should be structured.
+{
+  "name of glyph(without file extension(.png.).).": {
+    "style": "preferred style from Elements folder.",
+    "bg": "blind background color, leave blank for default.",
+    "dark": "blind dark bottom part color, leave blank for default.",
+    "glyph": "blind glyph color, leave blank for default.",
+    "shine1": "the part of the shine effect that goes over the background, leave blank for default.",
+    "shine2": "the part of the shine effect that goes over the glyph, leave blank for default."
+  }
+}
+colors should be hex codes(6("RGB) or 8 digits long("ffffff" or "ffffffff").). 
+
+For multiple blinds, separate each segment with a comma and use a unique glyph name for each one(If you intend to use the same image for multiple blinds, make copies and give them new names).  
+{
+  "example1": {
+    "style": "example",
+    "bg": "example",
+    "dark": "example",
+    "glyph": "example",
+    "shine1": "example",
+    "shine2": "example"
+  },
+  "example2": {
+    "style": "example",
+    "bg": "example",
+    "dark": "example",
+    "glyph": "example",
+    "shine1": "example",
+    "shine2": "example"
+  }
+}
