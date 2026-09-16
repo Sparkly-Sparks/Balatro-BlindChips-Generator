@@ -9,6 +9,6 @@ This is a python script (and files) for creating textures for boss blinds for mo
 1. Go to the [latest release](https://github.com/Sparkly-Sparks/Balatro-BlindChips-Generator/releases/latest)
 2. Download the Source code (zip).
 3. Put the symbols for your blinds in the "Glyphs" folder.
-4. Run and use blind-gen.py.
+4. Run and use blinds-gen.py.
 # Feedback
 If you have anything to say about your experience, you may do so [here]().
