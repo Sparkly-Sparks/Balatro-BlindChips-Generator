@@ -1,5 +1,6 @@
 # ![icon](Icon.png) Balatro BlindChips Generator
 This is a python script (and files) for creating textures for boss blinds for mods for the game Balatro.
+![BlindChips](Output/BlindChips(1).png)
 # Requirements
 - A way to run python files
 - [Pillow](https://pillow.readthedocs.io/en/stable/installation/basic-installation.html)
