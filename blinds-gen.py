@@ -2,11 +2,13 @@ from PIL import Image
 import os
 from random import randint
 import math
+import json
+import sys
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 active_preview=False #Turn this on to get jumpscared by a preview image every time you add a blind and once the file is saved.
 scale=34 #Change this if you want other resolutions(Will require changing the files in the Elements and Glyphs folders).
-ask_to_center=False #Turn this on if you want to be asked if you want the blind's symbol to be automatically centered. (Not sure why anyone would want this.)
+ask_to_center=False #Turn this on if you want the blind's symbol to be automatically centered. (Not sure why anyone would want this.)
 
 def hexadec(x,default="ffffff"):
     if x=="":
@@ -76,26 +78,48 @@ def save(image):
         input()
     image.save("Output/"+name)
     if name in os.listdir("Output"):
-        print("File saved.")
+        print(f"File saved ({name}).")
 
-def set_style():
+def set_style(style,preset):
     while True:
-        print("Styles",os.listdir("Elements"))
-        style=input("Select the style you want to use.\nLeave blank for default. (default=default)\n:")
+        if style=="":
+            print("Styles",os.listdir("Elements"))
+            style=input("Select the style you want to use.\nLeave blank for default. (default=default)\n:")
         if style=="":
             style="default"
         if style in os.listdir("Elements"):
             break
         print(f"Style ({style}) not found")
+        style=""
+        if preset:
+            sys.exit("Fix your preset file before retrying.")
     return style
 
 while True:
-    mode=input("\nTo make blinds from scratch, type (A/a)\nTo shine preexisting blinds, type (B/b)\n: ").lower()
-    if mode in ["a","b"]:
+    mode=input("\nTo make blinds from scratch manually, type (A/a)\nTo shine preexisting blinds, type (B/b)\nTo use a preset file, type (C/c)\n: ").lower()
+    if mode in ["a","b","c"]:
         break
     print(f"Invalid input, please retry. ({mode})")
 
-if mode=="a":
+if mode=="c":
+    while True:
+        preset=[]
+        for i in os.listdir("Presets"):
+            preset.append(i.replace(".json",""))
+        print("Presets",preset)
+        preset=input("Select the preset you want to use.\nLeave blank for default. (default=default)\n:")
+        if preset=="":
+            preset="default"
+        if preset+".json" in os.listdir("Presets"):
+            with open(f"Presets/{preset}.json", "r") as preset:
+                preset=json.load(preset)
+                preset_blinds=[]
+                for i in preset:
+                    preset_blinds.append(i)
+            break
+        print(f"Preset ({preset}) not found")
+
+if mode in ["a","c"]:
     cycle=0
     faces=[]
     Output=Image.new("RGBA",(21*scale,scale*(cycle+1)))
@@ -106,10 +130,16 @@ if mode=="a":
             temp.paste(Output,(0,0))
             Output=temp
 
-        style=set_style()
+        style=""
+        if mode=="c":
+            style=preset[preset_blinds[cycle]]["style"]
+        style=set_style(style,mode=="c")
 
         while True:
-            bgcol=hexadec(input("Input 6 or 8 digit hex code (RGB or RGBA) for background.\nLeave blank for default. (default=808080ff)\n: "),"808080ff")
+            if mode=="a":
+                bgcol=hexadec(input("Input 6 or 8 digit hex code (RGB or RGBA) for background.\nLeave blank for default. (default=808080ff)\n: "),"808080ff")
+            if mode=="c":
+                bgcol=hexadec(preset[preset_blinds[cycle]]["bg"])
             if bgcol!="input error":
                 pallete("create","Pallete/bgcol",tuple(bgcol),"")
                 for num,i in enumerate(Image.open(f"Elements/{style}/BG.png").get_flattened_data()):
@@ -117,13 +147,19 @@ if mode=="a":
                     if i[3]>0:
                         Output.paste(Image.open("Pallete/bgcol.png"),(pixel[0],pixel[1]+scale*cycle))
                 break
-            print(f"Check your input and try again\n: {bgcol}")
+            print(f"Invalid input\n: {bgcol}")
+            if mode=="c":
+                sys.exit("Fix your preset file before retrying.")
+
 
         pallete("create","Pallete/dark",(0,0,0,123),"")
         autodark=decihex(pallete("color","","Pallete/bgcol","Pallete/dark"))
 
         while True:
-            darkcol=hexadec(input(f"Input 6 or 8 digit hex code (RGB or RGBA) for the dark pixels below.\nLeave blank for automatic mode(not recommended). (auto={autodark})\n: "),autodark)
+            if mode=="a":
+                darkcol=hexadec(input(f"Input 6 or 8 digit hex code (RGB or RGBA) for the dark pixels below.\nLeave blank for automatic mode(not recommended). (auto={autodark})\n: "),autodark)
+            if mode=="c":
+                darkcol=hexadec(preset[preset_blinds[cycle]]["dark"],autodark)
             if darkcol!="input error":
                 pallete("create","Pallete/darkcol",tuple(darkcol),"")
                 for num,i in enumerate(Image.open(f"Elements/{style}/dark.png").get_flattened_data()):
@@ -132,18 +168,25 @@ if mode=="a":
                         Output.paste(Image.open("Pallete/darkcol.png"),(pixel[0],pixel[1]+scale*cycle))
                 break
             print(f"Check your input and try again\n: {darkcol}")
+            if mode=="c":
+                sys.exit("Fix your preset file before retrying.")
 
         while True:
             for i in os.listdir("Glyphs"):
-                if ".png" in i:
+                if ".png" in i and mode!="c":
                     print(i.replace(".png",""))
-            face=input("Select glyph from list(Glyphs folder). (Supports transparency)\nLeave blank for default. (default=S_Small_Blind)\n:")
+            if mode=="a":
+                face=input("Select glyph from list(Glyphs folder). (Supports transparency)\nLeave blank for default. (default=S_Small_Blind)\n:")
+            if mode=="c":
+                face=preset_blinds[cycle]
             if face=="":
                 face="S_Small_Blind"
             if face+".png" in os.listdir("Glyphs"):
                 faces.append(face)
                 break
             print(f"Glyph not found\n: {face}\n")
+            if mode=="c":
+                sys.exit("Fix your preset file before retrying.")
 
         center=[0,0]
         if ask_to_center:
@@ -166,7 +209,10 @@ if mode=="a":
             print(center)
 
         while True:
-            fgcol=hexadec(input(f"Input 6 digit hex code (RGB) for the glyph color.\nLeave blank for automatic mode(not recommended). (auto=000000)\n: "),"000000")
+            if mode=="a":
+                fgcol=hexadec(input(f"Input 6 digit hex code (RGB) for the glyph color.\nLeave blank for automatic mode(not recommended). (auto=000000)\n: "),"000000")
+            if mode=="c":
+                fgcol=hexadec(preset[preset_blinds[cycle]]["glyph"])
             if fgcol!="input error":
                 for num,i in enumerate(Image.open(f"Glyphs/{face}.png").get_flattened_data()):
                     pixel=coords(num)
@@ -175,14 +221,21 @@ if mode=="a":
                         Output.paste(Image.open("Pallete/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]+scale*cycle))
                 break
             print(f"Check your input and try again\n: {fgcol}\n")
+            if mode=="c":
+                sys.exit("Fix your preset file before retrying.")
 
         if active_preview:
             Output.show()
-        while True:
-            x=input('To add one more blind, enter "(Y/y)"\nTo finish and proceed to adding shine animation, enter (N/n)\n: ').lower()
-            if x in ["y","n"]:
-                break
-            print("Wrong answer.\n")
+        if mode=="a":
+            while True:
+                x=input('To add one more blind, enter "(Y/y)"\nTo finish and proceed to adding shine animation, enter (N/n)\n: ').lower()
+                if x in ["y","n"]:
+                    break
+                print("Wrong answer.\n")
+        if mode=="c":
+            x="n"
+            if len(preset_blinds)-1>cycle:
+                x="y"
         if x=="n":
             break
         cycle+=1
@@ -204,7 +257,7 @@ if mode=="b":
             for i in range(int(Output.size[1]/scale)):
                 faces.append("???")
             break
-    style=set_style()
+    style=set_style("",mode=="c")
 
 for cycle,i in enumerate(faces):
     nth="th"
@@ -220,15 +273,21 @@ for cycle,i in enumerate(faces):
                 nth="st"
     print(f"Applying shine to {cycle+1}{nth} blind in list({i}).")
     while True:
-        shinecol1=hexadec(input("Input 6 or 8 digit hex code (RGB or RGBA) for shine effect 1 (Will shine over blind background).\nLeave blank for default(not recommended). (default=ffffff4d)\n: "),"ffffff4d")
+        if mode in ["a","b"]:
+            shinecol1=hexadec(input("Input 6 or 8 digit hex code (RGB or RGBA) for shine effect 1 (Will shine over blind background).\nLeave blank for default(not recommended). (default=ffffff4d)\n: "),"ffffff4d")
+        if mode=="c":
+            shinecol1=hexadec(preset[preset_blinds[cycle]]["shine1"])
         if shinecol1!="input error":
             break
         print(f"Check your input and try again\n: {shinecol1}")
+        if mode=="c":
+            sys.exit("Fix your preset file before retrying.")
 
     while True:
-        shinecol2=False
-        if mode!="b":
+        if mode in ["a","b"]:
             shinecol2=hexadec(input(f"Input 6 or 8 digit hex code (RGB or RGBA) for shine effect 2 (Will shine over blind glyph).\nLeave blank for default(not recommended). (default={decihex(shinecol1)})\n: "),decihex(shinecol1))
+        if mode=="c":
+            shinecol2=hexadec(preset[preset_blinds[cycle]]["shine2"])
         if shinecol2!="input error":
             pallete("create","Pallete/shine1",tuple(shinecol1),"")
             if mode!="b":
@@ -239,13 +298,15 @@ for cycle,i in enumerate(faces):
                     pixel=coords(num)
                     if k[3]>0:
                         shine=1
-                        if mode!="b"and Image.open(f"Glyphs/{i}.png").get_flattened_data()[num][3]>0:
+                        if Image.open(f"Glyphs/{i}.png").get_flattened_data()[num][3]>0:
                             shine=2
                         Output.alpha_composite(Image.open(f"Pallete/shine{shine}.png"),(pixel[0]+scale*j,pixel[1]+scale*cycle))
             if active_preview:
                 Output.show()
             break
         print(f"Check your input and try again\n: {shinecol2}")
+        if mode=="c":
+            sys.exit("Fix your preset file before retrying.")
 save(Output)
 if active_preview:
     Output.show()
