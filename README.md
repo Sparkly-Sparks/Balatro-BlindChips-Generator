@@ -3,7 +3,7 @@ This is a python script (and files) for creating textures for boss blinds for mo
 ![BlindChips](Output/BlindChips(1).png)
 # Requirements
 - A way to run python files
-- [Pillow](https://pillow.readthedocs.io/en/stable/installation/basic-installation.html)
+- [Pillow](https://pillow.readthedocs.io/en/stable/installation/basic-installation.html) (not PIL)
 - The ability to read
 # How to use
 1. Go to the [latest release](https://github.com/Sparkly-Sparks/Balatro-BlindChips-Generator/releases/latest)
