@@ -6,9 +6,12 @@ import json
 import sys
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-active_preview=False #Turn this on to get jumpscared by a preview image every time you add a blind and once the file is saved.
-scale=34 #Change this if you want other resolutions(Will require changing the files in the Elements and Glyphs folders).
-ask_to_center=False #Turn this on if you want the blind's symbol to be automatically centered. (Not sure why anyone would want this.)
+with open("settings.json", "r") as settings:
+    settings=json.load(settings)
+
+active_preview=settings["settings"]["active_preview"] #Turn this on to get jumpscared by a preview image every time you add a blind and once the file is saved.
+scale=settings["settings"]["scalex"] #Change this if you want other resolutions(Will require changing the files in the Elements and Glyphs folders).
+ask_to_center=settings["settings"]["center"] #Turn this on if you want the blind's symbol to be automatically centered. (Not sure why anyone would want this.)
 
 def hexadec(x,default="ffffff"):
     if x=="":

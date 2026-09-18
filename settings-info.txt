@@ -1,0 +1,3 @@
+active_preview: if enabled, will open a preview of the blinds you make in mode "A"
+scalex, scaley: resolution
+center: if enabled, will automatically center your blind's glyph
