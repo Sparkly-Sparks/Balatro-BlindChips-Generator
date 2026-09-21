@@ -10,8 +10,10 @@ with open("settings.json", "r") as settings:
     settings=json.load(settings)
 
 active_preview=settings["settings"]["active_preview"] #Turn this on to get jumpscared by a preview image every time you add a blind and once the file is saved.
-scale=settings["settings"]["scalex"] #Change this if you want other resolutions(Will require changing the files in the Elements and Glyphs folders).
 ask_to_center=settings["settings"]["center"] #Turn this on if you want the blind's symbol to be automatically centered. (Not sure why anyone would want this.)
+frames=settings["settings"]["frames"] #Change this if you want more or less than 21 frames of animation.
+scale=settings["settings"]["scalex"] #Change this if you want other resolutions(Will require changing the files in the Elements and Glyphs folders).
+
 
 def hexadec(x,default="ffffff"):
     if x=="":
@@ -125,11 +127,11 @@ if mode=="c":
 if mode in ["a","c"]:
     cycle=0
     faces=[]
-    Output=Image.new("RGBA",(21*scale,scale*(cycle+1)))
+    Output=Image.new("RGBA",(frames*scale,scale*(cycle+1)))
     while True:
         print("Currently making blind number",cycle+1)
         if cycle>0:
-            temp=Image.new("RGBA",(21*scale,scale*(cycle+1)))
+            temp=Image.new("RGBA",(frames*scale,scale*(cycle+1)))
             temp.paste(Output,(0,0))
             Output=temp
 
@@ -295,8 +297,8 @@ for cycle,i in enumerate(faces):
             pallete("create","Pallete/shine1",tuple(shinecol1),"")
             if mode!="b":
                 pallete("create","Pallete/shine2",tuple(shinecol2),"")
-            for j in range(21):
-                shape=f"shine{max(1,j-11)}.png"
+            for j in range(frames):
+                shape=f"Shine/shine{j+1}.png"
                 for num,k in enumerate(Image.open(f"Elements/{style}/{shape}").get_flattened_data()):
                     pixel=coords(num)
                     if k[3]>0:

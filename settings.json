@@ -1,6 +1,7 @@
 {
   "settings": {
     "active_preview": false,
+    "frames": 21,
     "center": false,
     "scalex": 34,
     "scaley": 0
