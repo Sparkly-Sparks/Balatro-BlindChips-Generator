@@ -1,4 +1,4 @@
 active_preview: if enabled, will open a preview of the blinds you make in mode "A"
 frames: lenght of animation
 center: if enabled, will automatically center your blind's glyph
-scalex, scaley: resolution
+scale: resolution (x and y)
