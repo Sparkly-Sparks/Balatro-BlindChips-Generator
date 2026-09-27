@@ -1,5 +1,5 @@
 # ![icon](Icon.png) Balatro BlindChips Generator
-This is a program (and files) for creating textures for boss blinds for mods for the game Balatro.
+This is a windows program (and files) for creating textures for boss blinds for mods for the game Balatro.
 ![BlindChips](App.png)
 # Requirements
 - The ability to read
