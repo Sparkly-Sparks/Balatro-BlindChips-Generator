@@ -6,11 +6,12 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import colorchooser
 from tkinter import ttk
-from turtle import back, bgcolor, left
+from turtle import back, bgcolor, left, width
 from PIL import Image
 from PIL import ImageTk
 import os
 from random import randint
+import math
 
 #main window
 window = Tk()
@@ -160,6 +161,10 @@ def nth(num):
                 nth="st"
     return nth
 
+def update_progress(per,cent):
+    prog_var.set(math.floor((per/cent)*100))
+    window.update_idletasks()
+
 #settings menu
 menubar=Menu(window)
 window.config(menu=menubar)
@@ -206,9 +211,12 @@ def drawpreview(mode):
         savebutt.config(state="disabled")
         status_var.set("Creating "+str(amount.get()+1)+nth(amount.get()+1)+" blind")
     else:
+        progress.config(value=1)
+        per=0
         scalex=controlsettings("r","scale")[0]
         frames=controlsettings("r","frames")
         scaley=controlsettings("r","scale")[1]
+        cent=scalex*scaley*(frames+3)
         if amount.get()==0:
             blindchips=Image.new("RGBA",(frames*scalex,scaley))
         else:
@@ -219,16 +227,24 @@ def drawpreview(mode):
         style=style_var.get()
         efill(bgcol_var)
         pallete("create","Pallete/bgcol","#"+bgcol_var.get(),"")
+        bgcolpng=Image.open("Pallete/bgcol.png")
         for num,i in enumerate(Image.open(f"Elements/{style}/BG.png").get_flattened_data()):
             pixel=coords(num)
             if i[3]>0:
-                Output.paste(Image.open("Pallete/bgcol.png"),(pixel[0],pixel[1]))
+                Output.paste(bgcolpng,(pixel[0],pixel[1]))
+            if pixel[0]==scalex-1:
+                per+=scalex
+                update_progress(per,cent)
         efill(darkcol_var)
         pallete("create","Pallete/darkcol","#"+darkcol_var.get(),"")
+        darkcolpng=Image.open("Pallete/darkcol.png")
         for num,i in enumerate(Image.open(f"Elements/{style}/dark.png").get_flattened_data()):
             pixel=coords(num)
             if i[3]>0:
-                Output.paste(Image.open("Pallete/darkcol.png"),(pixel[0],pixel[1]))
+                Output.paste(darkcolpng,(pixel[0],pixel[1]))
+            if pixel[0]==scalex-1:
+                per+=scalex
+                update_progress(per,cent)
         face=glyph_var.get()
         center=[0,0]
         if controlsettings("r","center"):
@@ -244,8 +260,8 @@ def drawpreview(mode):
                 for i in range(center.size[1]):
                     if center.getpixel((i,j))[3]>0:
                         if up==0:
-                            up=i
-                        down=center.size[0]-i-1
+                            up=j
+                        down=center.size[0]-j-1
             center=[math.ceil((left+right)/2)-left,math.ceil((up+down)/2)-up]
 
         efill(fgcol_var)
@@ -255,7 +271,9 @@ def drawpreview(mode):
             if i[3]>0:
                 pallete("create","Pallete/brush",(fgcol[0],fgcol[1],fgcol[2],i[3]),"")
                 Output.paste(Image.open("Pallete/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
-
+            if pixel[0]==scalex-1:
+                per+=scalex
+                update_progress(per,cent)
         temp=Output
         for i in range(frames-1):
             Output.paste(temp,(scalex*(i+1),0))
@@ -264,15 +282,21 @@ def drawpreview(mode):
         efill(shine2_var)
         pallete("create","Pallete/shine1","#"+shine1_var.get(),"")
         pallete("create","Pallete/shine2","#"+shine2_var.get(),"")
+        shine1png=Image.open(f"Pallete/shine1.png")
+        shine2png=Image.open(f"Pallete/shine2.png")
         for j in range(frames):
             shape=f"Shine/shine{j+1}.png"
             for num,k in enumerate(Image.open(f"Elements/{style}/{shape}").get_flattened_data()):
                 pixel=coords(num)
                 if k[3]>0:
-                    shine=1
+                    shine=shine1png
                     if Image.open(f"Glyphs/{glyph_var.get()}").get_flattened_data()[num][3]>0:
-                        shine+=1
-                    Output.alpha_composite(Image.open(f"Pallete/shine{shine}.png"),(pixel[0]+scalex*j,pixel[1]))
+                        shine=shine2png
+                    Output.alpha_composite(shine,(pixel[0]+scalex*j,pixel[1]))
+                if pixel[0]==scalex-1:
+                    per+=scalex
+                    update_progress(per,cent)
+
         if mode=="preview":
             Output.save("Pallete/preview1.png")
             previewgened.set(True)
@@ -431,15 +455,18 @@ prototype_image=ImageTk.PhotoImage(prototype_image)
 prototype=Label(frame3,background="#808080",image=prototype_image)
 prototype.grid(column=0,row=1,columnspan=3,padx=20,pady=3)
 previewgened=BooleanVar(value=False)
+prog_var=IntVar(value=0)
+progress=ttk.Progressbar(frame3,mode="determinate",length=300,variable=prog_var)
+progress.grid(column=0,row=2,columnspan=4)
 genprototype=Button(frame3,text="Refresh Preview",font=("",16),command=lambda: drawpreview("preview"))
-genprototype.grid(column=0,row=2,pady=10)
-frameleft=Button(frame3,text="<",font=("",16),command=lambda: previewframes(prototype,"left")).grid(column=1,row=2)
+genprototype.grid(column=0,row=3,pady=10)
+frameleft=Button(frame3,text="<",font=("",16),command=lambda: previewframes(prototype,"left")).grid(column=1,row=3)
 framenum_var=IntVar(value=1)
-framenum=Label(frame3,textvariable=framenum_var,font=("",16),width=2).grid(column=2,row=2)
-frameright=Button(frame3,text=">",font=("",16),command=lambda: previewframes(prototype,"right")).grid(column=3,row=2,padx=4)
-addbutt=Button(frame3,text="Add blind to file",font=("",16),command=lambda: drawpreview("add")).grid(column=0,row=3)
+framenum=Label(frame3,textvariable=framenum_var,font=("",16),width=2).grid(column=2,row=3)
+frameright=Button(frame3,text=">",font=("",16),command=lambda: previewframes(prototype,"right")).grid(column=3,row=3,padx=4)
+addbutt=Button(frame3,text="Add blind to file",font=("",16),command=lambda: drawpreview("add")).grid(column=0,row=4)
 savebutt=Button(frame3,text="Save file to Output",font=("",16),command=lambda: drawpreview("save"))
-savebutt.grid(column=0,row=4,pady=10)
+savebutt.grid(column=0,row=5,pady=10)
 savebutt.config(state="disabled")
 
 #contents
