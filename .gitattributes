@@ -1,3 +1,5 @@
 .gitattributes export-ignore
 App.png export-ignore
+BBG(GUI).py export-ignore
+blinds-gen.py export-ignore
 README.md export-ignore
