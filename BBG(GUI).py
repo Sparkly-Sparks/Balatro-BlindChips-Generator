@@ -278,7 +278,7 @@ def drawpreview(mode):
             for num,i in enumerate(Image.open(f"Glyphs/{face}").get_flattened_data()):
                 pixel=coords(num)
                 if i[3]>0:
-                    pallete("create","Pallete/brush",(fgcol[0],fgcol[1],fgcol[2],i[3]),"")
+                    pallete("create","Pallete/brush",(fgcol[0],fgcol[1],fgcol[2],(math.ceil((fgcol[3]+i[3])/2))),"")
                     Output.paste(Image.open("Pallete/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
                 if pixel[0]==scalex-1:
                     per+=scalex
