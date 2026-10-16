@@ -271,7 +271,7 @@ def drawpreview(mode):
                         if center.getpixel((j,i))[3]>0:
                             if up==0:
                                 up=i
-                            down=center.size[0]-i-1
+                            down=center.size[1]-i-1
                 center=[math.ceil((left+right)/2)-left,math.ceil((up+down)/2)-up]
 
             fgcol=hexadec(fgcol_var.get())
