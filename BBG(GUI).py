@@ -268,7 +268,7 @@ def drawpreview(mode):
                             right=center.size[0]-i-1
                 for i in range(center.size[1]):
                     for j in range(center.size[0]):
-                        if center.getpixel((i,j))[3]>0:
+                        if center.getpixel((j,i))[3]>0:
                             if up==0:
                                 up=i
                             down=center.size[0]-i-1
