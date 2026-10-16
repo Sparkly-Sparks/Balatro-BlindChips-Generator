@@ -9,6 +9,6 @@ This is a windows program (and files) for creating textures for boss blinds for 
 3. Put the symbols for your blinds in the "Glyphs" folder.
 4. Run BBG(GUI).exe.
 5. Configure your blind and add to file. (Refreshing the preview and adding to file both take around 8 seconds.)
-6. Save file to Output.
+6. Save file to Output (The save function in pillow appears to not be case sensitive so make sure to use a unique name (probably use a number at the end)).
 # Feedback
 If you have anything to say about your experience, you may do so [here](https://discord.com/channels/1116389027176787968/1549759269425913917).
