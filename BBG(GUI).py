@@ -1,4 +1,3 @@
-from cProfile import label
 from tkinter import *
 from math import floor
 import json
@@ -6,7 +5,6 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from tkinter import colorchooser
 from tkinter import ttk
-from turtle import back, bgcolor, left, width
 from PIL import Image
 from PIL import ImageTk
 import os
@@ -46,7 +44,7 @@ def controlsettings(mode,key):
         if key=="scale":
             scale=[]
             num=""
-            text=simpledialog.askstring(title="Updating settings.json",prompt="Enter two new values(int) for width and height\t\n(ex: \"34x34\")",initialvalue="34x34").lower()
+            text=" "+simpledialog.askstring(title="Updating settings.json",prompt="Enter two new values(int) for width and height\t\n(ex: \"34x34\")",initialvalue="34x34").lower()
             for i in text:
                 if len(scale)>1:
                     break
@@ -312,13 +310,16 @@ def drawpreview(mode):
 
 def save(image):
     while True:
-        text=simpledialog.askstring(title="Saving to Output folder",prompt="Enter filename\t\t\t\t\t",initialvalue="BlindChips.png").lower()
-        ext=[".","p","n","g"]
-        if (ext[0]!=text[len(text)-4]) or (ext[1]!=text[len(text)-3]) or (ext[2]!=text[len(text)-2]) or (ext[3]!=text[len(text)-1]):
-            text+=".png"
-        if not (text in os.listdir("Output")) or messagebox.askyesno(title=f"\"{text}\" exists",message=f"File \"{text}\" already in Output\nOverwrite?"):
-            image.save("Output/"+text)
-            break
+        text=simpledialog.askstring(title="Saving to Output folder",prompt="Enter filename\t\t\t\t\t",initialvalue="BlindChips.png")
+        if text==None:
+            messagebox.showerror(title="Inputerror",message="Please enter a filename.")
+        else:
+            ext=[".","p","n","g"]
+            if len(text)<4 or (ext[0]!=text[len(text)-4]) or (ext[1]!=text[len(text)-3]) or (ext[2]!=text[len(text)-2]) or (ext[3]!=text[len(text)-1]):
+                text+=".png"
+            if not (text in os.listdir("Output")) or messagebox.askyesno(title=f"\"{text}\" exists",message=f"File \"{text}\" already in Output\nOverwrite?"):
+                image.save("Output/"+text)
+                break
 
 def previewframes(prototype,direction):
     frames=controlsettings("r","frames")
