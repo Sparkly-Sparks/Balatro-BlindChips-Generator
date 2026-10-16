@@ -163,6 +163,9 @@ def update_progress(per,cent):
     prog_var.set(math.floor((per/cent)*100))
     window.update_idletasks()
 
+def doxx():
+    return style_var.get()+glyph_var.get()+bgcol_var.get()+darkcol_var.get()+fgcol_var.get()+shine1_var.get()+shine2_var.get()
+
 #settings menu
 menubar=Menu(window)
 window.config(menu=menubar)
@@ -203,12 +206,18 @@ def pallete(mode,name="",image1="",image2=""):
 def drawpreview(mode):
     if mode=="save":
         blindchips=Image.open("Pallete/blindchips.png")
-        save(blindchips)
-        amount.set(0)
-        toggle("active")
-        savebutt.config(state="disabled")
-        status_var.set("Creating "+str(amount.get()+1)+nth(amount.get()+1)+" blind")
+        result=save(blindchips)
+        if result=="Saved":
+            amount.set(0)
+            toggle("active")
+            savebutt.config(state="disabled")
+            status_var.set("Creating "+str(amount.get()+1)+nth(amount.get()+1)+" blind")
     else:
+        efill(bgcol_var)
+        efill(darkcol_var)
+        efill(fgcol_var)
+        efill(shine1_var)
+        efill(shine2_var)
         progress.config(value=1)
         per=0
         scalex=controlsettings("r","scale")[0]
@@ -222,82 +231,83 @@ def drawpreview(mode):
             blindchips=Image.new("RGBA",(frames*scalex,scaley*(amount.get()+1)))
             blindchips.paste(temp,(0,0))
         Output=Image.new("RGBA",(scalex*frames,scaley))
-        style=style_var.get()
-        efill(bgcol_var)
-        pallete("create","Pallete/bgcol","#"+bgcol_var.get(),"")
-        bgcolpng=Image.open("Pallete/bgcol.png")
-        for num,i in enumerate(Image.open(f"Elements/{style}/BG.png").get_flattened_data()):
-            pixel=coords(num)
-            if i[3]>0:
-                Output.paste(bgcolpng,(pixel[0],pixel[1]))
-            if pixel[0]==scalex-1:
-                per+=scalex
-                update_progress(per,cent)
-        efill(darkcol_var)
-        pallete("create","Pallete/darkcol","#"+darkcol_var.get(),"")
-        darkcolpng=Image.open("Pallete/darkcol.png")
-        for num,i in enumerate(Image.open(f"Elements/{style}/dark.png").get_flattened_data()):
-            pixel=coords(num)
-            if i[3]>0:
-                Output.paste(darkcolpng,(pixel[0],pixel[1]))
-            if pixel[0]==scalex-1:
-                per+=scalex
-                update_progress(per,cent)
-        face=glyph_var.get()
-        center=[0,0]
-        if controlsettings("r","center"):
-            left=up=right=down=0
-            center=Image.open(f"Glyphs/{face}")
-            for i in range(center.size[0]):
-                for j in range(center.size[1]):
-                    if center.getpixel((i,j))[3]>0:
-                        if left==0:
-                            left=i
-                        right=center.size[0]-i-1
-            for j in range(center.size[0]):
-                for i in range(center.size[1]):
-                    if center.getpixel((i,j))[3]>0:
-                        if up==0:
-                            up=j
-                        down=center.size[0]-j-1
-            center=[math.ceil((left+right)/2)-left,math.ceil((up+down)/2)-up]
 
-        efill(fgcol_var)
-        fgcol=hexadec(fgcol_var.get())
-        for num,i in enumerate(Image.open(f"Glyphs/{face}").get_flattened_data()):
-            pixel=coords(num)
-            if i[3]>0:
-                pallete("create","Pallete/brush",(fgcol[0],fgcol[1],fgcol[2],i[3]),"")
-                Output.paste(Image.open("Pallete/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
-            if pixel[0]==scalex-1:
-                per+=scalex
-                update_progress(per,cent)
-        temp=Output
-        for i in range(frames-1):
-            Output.paste(temp,(scalex*(i+1),0))
-
-        efill(shine1_var)
-        efill(shine2_var)
-        pallete("create","Pallete/shine1","#"+shine1_var.get(),"")
-        pallete("create","Pallete/shine2","#"+shine2_var.get(),"")
-        shine1png=Image.open(f"Pallete/shine1.png")
-        shine2png=Image.open(f"Pallete/shine2.png")
-        for j in range(frames):
-            shape=f"Shine/shine{j+1}.png"
-            for num,k in enumerate(Image.open(f"Elements/{style}/{shape}").get_flattened_data()):
+        if mode in ["add","preview"] and lastpreview.get()==doxx():
+            Output=previewframes(prototype,"down")
+        else:
+            style=style_var.get()
+            pallete("create","Pallete/bgcol","#"+bgcol_var.get(),"")
+            bgcolpng=Image.open("Pallete/bgcol.png")
+            for num,i in enumerate(Image.open(f"Elements/{style}/BG.png").get_flattened_data()):
                 pixel=coords(num)
-                if k[3]>0:
-                    shine=shine1png
-                    if Image.open(f"Glyphs/{glyph_var.get()}").get_flattened_data()[num][3]>0:
-                        shine=shine2png
-                    Output.alpha_composite(shine,(pixel[0]+scalex*j,pixel[1]))
+                if i[3]>0:
+                    Output.paste(bgcolpng,(pixel[0],pixel[1]))
                 if pixel[0]==scalex-1:
                     per+=scalex
                     update_progress(per,cent)
 
-        if mode=="preview":
+            pallete("create","Pallete/darkcol","#"+darkcol_var.get(),"")
+            darkcolpng=Image.open("Pallete/darkcol.png")
+            for num,i in enumerate(Image.open(f"Elements/{style}/dark.png").get_flattened_data()):
+                pixel=coords(num)
+                if i[3]>0:
+                    Output.paste(darkcolpng,(pixel[0],pixel[1]))
+                if pixel[0]==scalex-1:
+                    per+=scalex
+                    update_progress(per,cent)
+            face=glyph_var.get()
+            center=[0,0]
+            if controlsettings("r","center"):
+                left=up=right=down=0
+                center=Image.open(f"Glyphs/{face}")
+                for i in range(center.size[0]):
+                    for j in range(center.size[1]):
+                        if center.getpixel((i,j))[3]>0:
+                            if left==0:
+                                left=i
+                            right=center.size[0]-i-1
+                for i in range(center.size[1]):
+                    for j in range(center.size[0]):
+                        if center.getpixel((i,j))[3]>0:
+                            if up==0:
+                                up=i
+                            down=center.size[0]-i-1
+                center=[math.ceil((left+right)/2)-left,math.ceil((up+down)/2)-up]
+
+            fgcol=hexadec(fgcol_var.get())
+            for num,i in enumerate(Image.open(f"Glyphs/{face}").get_flattened_data()):
+                pixel=coords(num)
+                if i[3]>0:
+                    pallete("create","Pallete/brush",(fgcol[0],fgcol[1],fgcol[2],i[3]),"")
+                    Output.paste(Image.open("Pallete/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
+                if pixel[0]==scalex-1:
+                    per+=scalex
+                    update_progress(per,cent)
+            temp=Output
+            for i in range(frames-1):
+                Output.paste(temp,(scalex*(i+1),0))
+
+            pallete("create","Pallete/shine1","#"+shine1_var.get(),"")
+            pallete("create","Pallete/shine2","#"+shine2_var.get(),"")
+            shine1png=Image.open(f"Pallete/shine1.png")
+            shine2png=Image.open(f"Pallete/shine2.png")
+            for j in range(frames):
+                shape=f"Shine/shine{j+1}.png"
+                for num,k in enumerate(Image.open(f"Elements/{style}/{shape}").get_flattened_data()):
+                    pixel=coords(num)
+                    if k[3]>0:
+                        shine=shine1png
+                        if Image.open(f"Glyphs/{glyph_var.get()}").get_flattened_data()[num][3]>0:
+                            shine=shine2png
+                        Output.alpha_composite(shine,(pixel[0]+scalex*j,pixel[1]))
+                    if pixel[0]==scalex-1:
+                        per+=scalex
+                        update_progress(per,cent)
+
+        if mode in ["preview","add"]:
             Output.save("Pallete/preview1.png")
             previewgened.set(True)
+            lastpreview.set(doxx())
             previewframes(prototype,"up")
         if mode=="add":
             blindchips.paste(Output,(0,amount.get()*scaley))
@@ -311,7 +321,10 @@ def drawpreview(mode):
 def save(image):
     while True:
         text=simpledialog.askstring(title="Saving to Output folder",prompt="Enter filename\t\t\t\t\t",initialvalue="BlindChips.png")
+        print(type(text))
         if text==None:
+            break
+        if text=="":
             messagebox.showerror(title="Inputerror",message="Please enter a filename.")
         else:
             ext=[".","p","n","g"]
@@ -320,6 +333,10 @@ def save(image):
             if not (text in os.listdir("Output")) or messagebox.askyesno(title=f"\"{text}\" exists",message=f"File \"{text}\" already in Output\nOverwrite?"):
                 image.save("Output/"+text)
                 break
+    if text==None:
+        return "Cancelled"
+    else:
+        return "Saved"
 
 def previewframes(prototype,direction):
     frames=controlsettings("r","frames")
@@ -338,10 +355,14 @@ def previewframes(prototype,direction):
     image=0
     if previewgened.get():
         image+=1
-    prototype_image=Image.open(f"Pallete/preview{image}.png").crop((scale[0]*frame,0,scale[0]*(frame+1),scale[1])).resize((250,250),Image.Resampling.BOX)
-    prototype_image=ImageTk.PhotoImage(prototype_image)
-    prototype.config(image=prototype_image)
-    prototype.image=prototype_image
+    prototype_image=Image.open(f"Pallete/preview{image}.png")
+    if direction=="down":
+        return prototype_image
+    else:
+        prototype_image=prototype_image.crop((scale[0]*frame,0,scale[0]*(frame+1),scale[1])).resize((250,250),Image.Resampling.BOX)
+        prototype_image=ImageTk.PhotoImage(prototype_image)
+        prototype.config(image=prototype_image)
+        prototype.image=prototype_image
 
 #color picker
 def pick():
@@ -420,6 +441,7 @@ darkcol_var=StringVar(value="424242ff")
 fgcol_var=StringVar(value="000000ff")
 shine1_var=StringVar(value="ffffff4d")
 shine2_var=StringVar(value="ffffff4d")
+lastpreview=StringVar(value=doxx())
 butticonsmall=Image.open("Colorpicker.png").resize((16,16))
 butticonsmall=ImageTk.PhotoImage(butticonsmall)
 autoiconsmall=Image.open("Auto.png").resize((16,16))
@@ -456,7 +478,7 @@ prototype_image=ImageTk.PhotoImage(prototype_image)
 prototype=Label(frame3,background="#808080",image=prototype_image)
 prototype.grid(column=0,row=1,columnspan=3,padx=20,pady=3)
 previewgened=BooleanVar(value=False)
-prog_var=IntVar(value=0)
+prog_var=IntVar(value=100)
 progress=ttk.Progressbar(frame3,mode="determinate",length=300,variable=prog_var)
 progress.grid(column=0,row=2,columnspan=4)
 genprototype=Button(frame3,text="Refresh Preview",font=("",16),command=lambda: drawpreview("preview"))
