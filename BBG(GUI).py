@@ -179,12 +179,12 @@ menubar.add_cascade(label="Settings",menu=settingbuttons)
 #pictures
 def preview(mode,frame=None):
     if mode=="picker":
-        Image.new("RGBA",(32,32),"#"+hex.get()).save("Pallete/ghost.png")
-        demo=PhotoImage(file="Pallete/ghost.png")
+        Image.new("RGBA",(32,32),"#"+hex.get()).save("Palette/ghost.png")
+        demo=PhotoImage(file="Palette/ghost.png")
         ghost.config(image=demo)
         ghost.image=demo
 
-def pallete(mode,name="",image1="",image2=""):
+def palette(mode,name="",image1="",image2=""):
     if mode=="create":
         pixel=Image.new("RGBA",(1,1),image1)
         pixel.save(name+".png")
@@ -205,7 +205,7 @@ def pallete(mode,name="",image1="",image2=""):
 
 def drawpreview(mode):
     if mode=="save":
-        blindchips=Image.open("Pallete/blindchips.png")
+        blindchips=Image.open("Palette/blindchips.png")
         result=save(blindchips)
         if result=="Saved":
             amount.set(0)
@@ -227,7 +227,7 @@ def drawpreview(mode):
         if amount.get()==0:
             blindchips=Image.new("RGBA",(frames*scalex,scaley))
         else:
-            temp=Image.open("Pallete/blindchips.png")
+            temp=Image.open("Palette/blindchips.png")
             blindchips=Image.new("RGBA",(frames*scalex,scaley*(amount.get()+1)))
             blindchips.paste(temp,(0,0))
         Output=Image.new("RGBA",(scalex*frames,scaley))
@@ -236,8 +236,8 @@ def drawpreview(mode):
             Output=previewframes(prototype,"down")
         else:
             style=style_var.get()
-            pallete("create","Pallete/bgcol","#"+bgcol_var.get(),"")
-            bgcolpng=Image.open("Pallete/bgcol.png")
+            palette("create","Palette/bgcol","#"+bgcol_var.get(),"")
+            bgcolpng=Image.open("Palette/bgcol.png")
             for num,i in enumerate(Image.open(f"Elements/{style}/BG.png").get_flattened_data()):
                 pixel=coords(num)
                 if i[3]>0:
@@ -246,8 +246,8 @@ def drawpreview(mode):
                     per+=scalex
                     update_progress(per,cent)
 
-            pallete("create","Pallete/darkcol","#"+darkcol_var.get(),"")
-            darkcolpng=Image.open("Pallete/darkcol.png")
+            palette("create","Palette/darkcol","#"+darkcol_var.get(),"")
+            darkcolpng=Image.open("Palette/darkcol.png")
             for num,i in enumerate(Image.open(f"Elements/{style}/dark.png").get_flattened_data()):
                 pixel=coords(num)
                 if i[3]>0:
@@ -278,8 +278,8 @@ def drawpreview(mode):
             for num,i in enumerate(Image.open(f"Glyphs/{face}").get_flattened_data()):
                 pixel=coords(num)
                 if i[3]>0:
-                    pallete("create","Pallete/brush",(fgcol[0],fgcol[1],fgcol[2],(math.ceil((fgcol[3]+i[3])/2))),"")
-                    Output.paste(Image.open("Pallete/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
+                    palette("create","Palette/brush",(fgcol[0],fgcol[1],fgcol[2],(math.ceil((fgcol[3]+i[3])/2))),"")
+                    Output.paste(Image.open("Palette/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
                 if pixel[0]==scalex-1:
                     per+=scalex
                     update_progress(per,cent)
@@ -287,10 +287,10 @@ def drawpreview(mode):
             for i in range(frames-1):
                 Output.paste(temp,(scalex*(i+1),0))
 
-            pallete("create","Pallete/shine1","#"+shine1_var.get(),"")
-            pallete("create","Pallete/shine2","#"+shine2_var.get(),"")
-            shine1png=Image.open(f"Pallete/shine1.png")
-            shine2png=Image.open(f"Pallete/shine2.png")
+            palette("create","Palette/shine1","#"+shine1_var.get(),"")
+            palette("create","Palette/shine2","#"+shine2_var.get(),"")
+            shine1png=Image.open(f"Palette/shine1.png")
+            shine2png=Image.open(f"Palette/shine2.png")
             for j in range(frames):
                 shape=f"Shine/shine{j+1}.png"
                 for num,k in enumerate(Image.open(f"Elements/{style}/{shape}").get_flattened_data()):
@@ -305,13 +305,13 @@ def drawpreview(mode):
                         update_progress(per,cent)
 
         if mode in ["preview","add"]:
-            Output.save("Pallete/preview1.png")
+            Output.save("Palette/preview1.png")
             previewgened.set(True)
             lastpreview.set(doxx())
             previewframes(prototype,"up")
         if mode=="add":
             blindchips.paste(Output,(0,amount.get()*scaley))
-            blindchips.save("Pallete/blindchips.png")
+            blindchips.save("Palette/blindchips.png")
             messagebox.showinfo(title="Blind added",message="Blind added to current file\nEditing next blind")
             amount.set(amount.get()+1)
             toggle("disabled")
@@ -355,7 +355,7 @@ def previewframes(prototype,direction):
     image=0
     if previewgened.get():
         image+=1
-    prototype_image=Image.open(f"Pallete/preview{image}.png")
+    prototype_image=Image.open(f"Palette/preview{image}.png")
     if direction=="down":
         return prototype_image
     else:
@@ -409,7 +409,7 @@ slider=Scale(frame,variable=alpha_var,from_=0,to=255,orient="horizontal",relief=
 slider.bind("<ButtonRelease>", lambda event: preview("picker"))
 slider.set("255")
 slider.grid(column=0,row=1,padx=20,pady=20)
-ghost=Label(frame,background="#ffffff",image=PhotoImage(file="Pallete/ghost.png"),relief="raised")
+ghost=Label(frame,background="#ffffff",image=PhotoImage(file="Palette/ghost.png"),relief="raised")
 ghost.grid(column=1,row=1)
 
 #blindconfig
@@ -451,14 +451,14 @@ bgcol.grid(column=0,row=5)
 bgget=Button(frame2,image=butticonsmall,command=lambda: choose(bgcol_var)).grid(column=1,row=5)
 darkcol=Entry(frame2,textvariable=darkcol_var,background="#f5f5f5",font=("",fontsize)).grid(column=0,row=7)
 darkget=Button(frame2,image=butticonsmall,command=lambda: choose(darkcol_var)).grid(column=1,row=7)
-autodark=Button(frame2,image=autoiconsmall,command=lambda: pallete("darken","",bgcol_var)).grid(column=2,row=7,padx=18)
+autodark=Button(frame2,image=autoiconsmall,command=lambda: palette("darken","",bgcol_var)).grid(column=2,row=7,padx=18)
 fgcol=Entry(frame2,textvariable=fgcol_var,background="#f5f5f5",font=("",fontsize)).grid(column=0,row=9)
 fgget=Button(frame2,image=butticonsmall,command=lambda: choose(fgcol_var)).grid(column=1,row=9)
 shinecol1=Entry(frame2,textvariable=shine1_var,background="#f5f5f5",font=("",fontsize)).grid(column=0,row=11)
 shine1get=Button(frame2,image=butticonsmall,command=lambda: choose(shine1_var)).grid(column=1,row=11)
 shinecol2=Entry(frame2,textvariable=shine2_var,background="#f5f5f5",font=("",fontsize)).grid(column=0,row=13)
 shine2get=Button(frame2,image=butticonsmall,command=lambda: choose(shine2_var)).grid(column=1,row=13)
-autoshine=Button(frame2,image=autoiconsmall,command=lambda: pallete("glaze")).grid(column=2,row=13,padx=18,pady=5)
+autoshine=Button(frame2,image=autoiconsmall,command=lambda: palette("glaze")).grid(column=2,row=13,padx=18,pady=5)
 bgcol_var.trace_add("write",lambda *args: hexcheck(bgcol_var))
 darkcol_var.trace_add("write",lambda *args: hexcheck(darkcol_var))
 fgcol_var.trace_add("write",lambda *args: hexcheck(fgcol_var))
@@ -473,7 +473,7 @@ scale=controlsettings("r","scale")
 amount=IntVar(value=0)
 status_var=StringVar(value="Creating "+str(amount.get()+1)+nth(amount.get()+1)+" blind")
 status=Label(frame3,textvariable=status_var,font=("",20)).grid(column=0,row=0,pady=5)
-prototype_image=Image.open("Pallete/preview0.png").crop((0,0,scale[0],scale[1])).resize((250,250),Image.Resampling.BOX)
+prototype_image=Image.open("Palette/preview0.png").crop((0,0,scale[0],scale[1])).resize((250,250),Image.Resampling.BOX)
 prototype_image=ImageTk.PhotoImage(prototype_image)
 prototype=Label(frame3,background="#808080",image=prototype_image)
 prototype.grid(column=0,row=1,columnspan=3,padx=20,pady=3)
