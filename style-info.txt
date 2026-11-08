@@ -1,0 +1,1 @@
+Showdown blinds have G.png in the style folder.
