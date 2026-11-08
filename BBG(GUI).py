@@ -246,12 +246,16 @@ def drawpreview(mode):
                     per+=scalex
                     update_progress(per,cent)
 
+            if "G.png" in os.listdir(f"Elements/{style}"):
+                Output.alpha_composite(Image.open(f"Elements/{style}/G.png"),(0,0))
+                bgcol=hexadec(bgcol_var.get())
+
             palette("create","Palette/darkcol","#"+darkcol_var.get(),"")
             darkcolpng=Image.open("Palette/darkcol.png")
             for num,i in enumerate(Image.open(f"Elements/{style}/dark.png").get_flattened_data()):
                 pixel=coords(num)
                 if i[3]>0:
-                    Output.paste(darkcolpng,(pixel[0],pixel[1]))
+                    Output.alpha_composite(darkcolpng,(pixel[0],pixel[1]))
                 if pixel[0]==scalex-1:
                     per+=scalex
                     update_progress(per,cent)
@@ -278,8 +282,18 @@ def drawpreview(mode):
             for num,i in enumerate(Image.open(f"Glyphs/{face}").get_flattened_data()):
                 pixel=coords(num)
                 if i[3]>0:
-                    palette("create","Palette/brush",(fgcol[0],fgcol[1],fgcol[2],(math.ceil((fgcol[3]+i[3])/2))),"")
-                    Output.paste(Image.open("Palette/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
+                    if "G.png" in os.listdir(f"Elements/{style}"):
+                        if i[0]+i[1]+i[2]+i[3]==1020:
+                            Output.paste(Image.open("Palette/crust.png"),(pixel[0]+center[0],pixel[1]+center[1]))
+                        else:
+                            palette("create","Palette/brush",(bgcol[0],bgcol[1],bgcol[2],(math.ceil((bgcol[3]+i[3])/2))),"")
+                            Output.paste(Image.open("Palette/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
+                            if i[0]+i[1]+i[2]==0 and i[3]==255:
+                                Output.alpha_composite(Image.open("Palette/darkcol.png"),(pixel[0]+center[0],pixel[1]+center[1]))
+                    else:
+                        palette("create","Palette/brush",(fgcol[0],fgcol[1],fgcol[2],(math.ceil((fgcol[3]+i[3])/2))),"")
+                        Output.paste(Image.open("Palette/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
+
                 if pixel[0]==scalex-1:
                     per+=scalex
                     update_progress(per,cent)
@@ -437,7 +451,7 @@ labels=["Style:","Glyph:","Background color:","Shading color:","Glyph color:","S
 for i in range(len(labels)):
     Label(frame2,text=labels[i],background="#ffffff",font=("",12)).grid(column=0,row=i*2,sticky="w",padx=5,pady=5)
 bgcol_var=StringVar(value="808080ff")
-darkcol_var=StringVar(value="424242ff")
+darkcol_var=StringVar(value="00000080")
 fgcol_var=StringVar(value="000000ff")
 shine1_var=StringVar(value="ffffff4d")
 shine2_var=StringVar(value="ffffff4d")

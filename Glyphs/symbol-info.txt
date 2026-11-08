@@ -1,0 +1,5 @@
+Showdown blinds have G.png in the style folder.
+
+For non showdown blinds, every color with opacity over 0 will be colored with Glyph color.
+
+For showdown blinds, white will be replaced with d4e3e5ff, black will be replaced with shading, and everthing else will be replaced with Background color.
