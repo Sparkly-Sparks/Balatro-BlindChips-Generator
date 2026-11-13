@@ -286,12 +286,13 @@ def drawpreview(mode):
                         if i[0]+i[1]+i[2]+i[3]==1020:
                             Output.paste(Image.open("Palette/crust.png"),(pixel[0]+center[0],pixel[1]+center[1]))
                         else:
-                            palette("create","Palette/brush",(bgcol[0],bgcol[1],bgcol[2],(math.ceil((bgcol[3]+i[3])/2))),"")
+                            palette("create","Palette/brush",(bgcol[0],bgcol[1],bgcol[2],(math.ceil(bgcol[3]*(i[3]/255)))),"")
+
                             Output.paste(Image.open("Palette/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
                             if i[0]+i[1]+i[2]==0 and i[3]==255:
                                 Output.alpha_composite(Image.open("Palette/darkcol.png"),(pixel[0]+center[0],pixel[1]+center[1]))
                     else:
-                        palette("create","Palette/brush",(fgcol[0],fgcol[1],fgcol[2],(math.ceil((fgcol[3]+i[3])/2))),"")
+                        palette("create","Palette/brush",(fgcol[0],fgcol[1],fgcol[2],(math.ceil(fgcol[3]*(i[3]/255)))),"")
                         Output.paste(Image.open("Palette/brush.png"),(pixel[0]+center[0],pixel[1]+center[1]))
 
                 if pixel[0]==scalex-1:
